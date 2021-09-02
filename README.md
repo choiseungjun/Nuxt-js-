@@ -9,7 +9,7 @@
 ###### * 클라이언트 사이드 렌더링은 페이지의 내용을 브라우저에서 그리고 서버 사이드 렌더링은 서버에서 페이지의 내용을 다 그려서 브라우저로 던져준다.
 
 깃헙 : https://github.com/nuxt/nuxt.js   
-공식 사이트 : https://ko.nuxtjs.org/   , https://develop365.gitlab.io/nuxtjs-0.10.7-doc/ko/guide/
+공식 사이트 : https://ko.nuxtjs.org/
 
 ### Nuxt 장점 
 - Nuxt.js 설치만으로 이미 scaffolding(프로젝트 구조화)을 해주므로 딱히 프로젝트 구조에 대해서 고민할 필요가 없다.   
@@ -19,17 +19,33 @@
 - webpack을 통한 빌드 시스템이 이미 구현되어 있다. 그저 npm run만 해주면 된다.  
 - **일반적인 SPA 개발은, 검색 엔진에서 노출되지 않아 조회가 힘들다. 하지만 Nuxt를 이용하게 되면 서버사이드렌더링으로 화면을 보여주기 때문에, 검색엔진 봇이 화면들을 잘 긁어갈 수 있다. 따라서 SPA로 개발하더라도 SEO(검색 엔진 최적화)를 걱정하지 않아도 된다.**
 
-
 ## 1. Nuxt 시작하기
 
-**1.1 Nuxt starter 템플릿 사용하기
+**1.1 Nuxt starter 템플릿 사용하기**  
+>  starter 템플릿을 .zip로 다운받아 사용하거나, vue-cli로 설치한다.  
 
-
-Vue cli 설치**
-
+	
+###### Vue cli 설치
     npm i -g @vue/cli   
     npm i -g @vue/cli-init
     
+**1.2 프로젝트 실행하기**
+
+	$ cd <project-name>
+	$ npm install
+	$ npm run dev
+
+http://localhost:3000/
+
+<br />
+    
+    
+## 2. 처음부터 시작하기   
+>  Nuxt를 처음 부터 시작하기 위해서는 한개의 파일의 한개의 디렉토리가 필요하다.
+
+	$ mkdir <project-name>
+	$ cd <project-name>
+
 
 **1.2 프로젝트 생성하기**
 
@@ -43,7 +59,6 @@ Vue cli 설치**
 
 	cd <project-name>
 	npm run dev
-	(NUXT 디렉토리가 자동 생성)
 
 http://localhost:3000/
 
@@ -89,4 +104,126 @@ http://localhost:3000/
 ## 3. 라우팅
 
 	Nuxt.js pages 디렉토리 내의 Vue 파일 구조를 기반으로 vue-router 설정을 자동으로 생성한다.
+	
+**3.1 기본 라우팅**
 
+**1. pages 폴더내 vue파일 생성시**
+
+```` js
+pages/
+--| user/
+-----| index.vue
+-----| one.vue
+--| index.vue
+````
+
+**2. .nuxt - router.js 파일내에 아래와 같이 라우터 자동 생성**
+
+```` js
+router: {
+  routes: [
+    {
+      name: 'index',
+      path: '/',
+      component: 'pages/index.vue'
+    },
+    {
+      name: 'user',
+      path: '/user',
+      component: 'pages/user/index.vue'
+    },
+    {
+      name: 'user-one',
+      path: '/user/one',
+      component: 'pages/user/one.vue'
+    }
+  ]
+}
+```` 
+
+**3.2 동적 라우팅**
+
+
+	파라메터가 있는 동적 라우트를 정의하기 위해서는 앞에 밑줄이 붙은 .vue 파일이나 폴더를 정의해야한다.
+	
+```` js
+pages/
+--| _slug/
+-----| comments.vue
+-----| index.vue
+--| users/
+-----| _id.vue
+--| index.vue
+
+
+아래와 같이 생성
+
+router: {
+  routes: [
+    {
+      name: 'index',
+      path: '/',
+      component: 'pages/index.vue'
+    },
+    {
+      name: 'users-id',
+      path: '/users/:id?',
+      component: 'pages/users/_id.vue'
+    },
+    {
+      name: 'slug',
+      path: '/:slug',
+      component: 'pages/_slug/index.vue'
+    },
+    {
+      name: 'slug-comments',
+      path: '/:slug/comments',
+      component: 'pages/_slug/comments.vue'
+    }
+  ]
+}
+
+````
+
+**3.3 트랜지션**
+	Nuxt.js는 경로 전환 과정에서 <transition> 컴포넌트를 사용해 놀라운 트랜지션/애니메이션을 만들어냅니다.
+	
+	
+###### * 모든 페이지에 페이드 애니메이션을 추가하기 위해서는 모든 라우트에 사용될 CSS 파일을 작성해야 한다. 
+	따라서 assets 폴더에 CSS 파일을 만드는 것부터 시작한다.  → 전역 css 파일인 assets/main.css
+	
+```` css
+.page-enter-active, .page-leave-active {
+  transition: opacity .5s;
+}
+.page-enter, .page-leave-to {
+  opacity: 0;
+}
+````
+	
+이를 nuxt.config.js 파일에 추가합니다:
+
+```` js
+module.exports = {
+  css: [
+    'assets/main.css'
+  ]
+}
+````
+	
+	
+## 4.레이아웃
+
+	Nuxt.js를 사용하면 layouts 폴더에 레이아웃을 추가함으로써 메인 레이아웃을 확장하거나 사용자 정의 레이아웃을 만들 수 있다.
+	메인 레이아웃을 확장하려면 layouts/default.vue 파일을 추가하며, 페이지 컴포넌트를 레이아웃에 렌더링하기 위해서 꼭 <nuxt/> 태그를 작성해야만 한다.
+
+	<template>
+	  <nuxt/>
+	</template>
+	
+## 5.에러 페이지
+	
+	에러 페이지를 커스터마이징하려면 layouts/error.vue 파일을 추가한다.
+	이 레이아웃은 <nuxt/> 태그를 포함하지 않으며, 404나 500 에러가 발생했을 때 이 레이아웃은 컴포넌트로 자동 연결된다.
+
+	
